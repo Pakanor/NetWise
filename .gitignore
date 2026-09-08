@@ -1,0 +1,6 @@
+bin/
+obj/
+.vs/
+.vscode/
+kot_ciek.txt
+appsettings.Development.json
