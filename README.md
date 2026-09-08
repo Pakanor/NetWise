@@ -6,7 +6,7 @@ Wymagania: .NET 8.0 SDK
 
 1. Klonowanie repozytorium:
    ```bash
-   git clone [https://github.com/Pakanor/NetWise.git](https://github.com/Pakanor/NetWise.git)
+   git clone https://github.com/Pakanor/NetWise.git
    cd NetWise
 
 2. Uruchomienie aplikacji:
