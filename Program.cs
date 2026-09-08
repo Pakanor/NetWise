@@ -5,39 +5,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-var host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((context, config) =>
-    {
-        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-    })
-    .ConfigureServices((context, services) =>
-    {
-        services.AddOptions<CatFactSettings>()
-            .Bind(context.Configuration.GetSection(CatFactSettings.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+var builder = Host.CreateApplicationBuilder(args);
 
-        services.AddHttpClient<ICatFactService, CatFactService>((serviceProvider, client) =>
-        {
-            var settings = serviceProvider.GetRequiredService<IOptions<CatFactSettings>>().Value;
-            client.BaseAddress = new Uri(settings.ApiBaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(10);
-        })
-        .AddStandardResilienceHandler();
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-        services.AddSingleton<IFileWriterService, FileWriterService>();
-    })
-    .Build();
+builder.Services.AddOptions<CatFactSettings>()
+    .Bind(builder.Configuration.GetSection(CatFactSettings.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
-await host.StartAsync();
-
-var catFactService = host.Services.GetRequiredService<ICatFactService>();
-var fileWriterService = host.Services.GetRequiredService<IFileWriterService>();
-var settings = host.Services.GetRequiredService<IOptions<CatFactSettings>>().Value;
-
-var factResponse = await catFactService.GetRandomFactAsync();
-
-if (factResponse is not null && !string.IsNullOrWhiteSpace(factResponse.Fact))
+builder.Services.AddHttpClient<ICatFactService, CatFactService>((serviceProvider, client) =>
 {
-    await fileWriterService.AppendLineAsync(settings.OutputFilePath, factResponse.Fact);
-}
+    var settings = serviceProvider.GetRequiredService<IOptions<CatFactSettings>>().Value;
+    client.BaseAddress = new Uri(settings.ApiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(10);
+})
+.AddStandardResilienceHandler();
+
+builder.Services.AddSingleton<IFileWriterService, FileWriterService>();
+builder.Services.AddHostedService<CatFactBackgroundService>();
+
+await builder.Build().RunAsync();

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CatFactFetcher.Services;
 
-public class CatFactService : ICatFactService
+public partial class CatFactService : ICatFactService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<CatFactService> _logger;
@@ -21,10 +21,17 @@ public class CatFactService : ICatFactService
         {
             return await _httpClient.GetFromJsonAsync<CatFactResponse>("fact", cancellationToken);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Wystąpił błąd podczas pobierania faktu z API.");
+            LogFetchError(_logger, ex);
             throw;
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Wystąpił błąd podczas pobierania faktu z API.")]
+    private static partial void LogFetchError(ILogger logger, Exception exception);
 }

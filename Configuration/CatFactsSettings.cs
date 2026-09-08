@@ -12,4 +12,7 @@ public class CatFactSettings
 
     [Required]
     public string OutputFilePath { get; set; } = string.Empty;
+
+    [Range(1, int.MaxValue)]
+    public int FetchIntervalSeconds { get; set; } = 10;
 }
