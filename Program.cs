@@ -20,7 +20,8 @@ var host = Host.CreateDefaultBuilder(args)
             var settings = serviceProvider.GetRequiredService<IOptions<CatFactSettings>>().Value;
             client.BaseAddress = new Uri(settings.ApiBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(10);
-        });
+        })
+        .AddStandardResilienceHandler();
 
         services.AddSingleton<IFileWriterService, FileWriterService>();
     })
