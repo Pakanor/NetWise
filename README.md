@@ -10,4 +10,4 @@ Wymagania: .NET 8.0 SDK
    cd NetWise
 
 2. Uruchomienie aplikacji:
-   dotnet run --project CatFactFetcher
+   dotnet run
