@@ -20,4 +20,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="CatFactFetcher.Tests/**/*.cs" />
+    <EmbeddedResource Remove="CatFactFetcher.Tests/**/*" />
+    <None Remove="CatFactFetcher.Tests/**/*" />
+  </ItemGroup>
+
 </Project>
