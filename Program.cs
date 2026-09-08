@@ -12,8 +12,10 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        services.Configure<CatFactSettings>(
-            context.Configuration.GetSection(CatFactSettings.SectionName));
+        services.AddOptions<CatFactSettings>()
+            .Bind(context.Configuration.GetSection(CatFactSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         services.AddHttpClient<ICatFactService, CatFactService>((serviceProvider, client) =>
         {
@@ -26,6 +28,8 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IFileWriterService, FileWriterService>();
     })
     .Build();
+
+await host.StartAsync();
 
 var catFactService = host.Services.GetRequiredService<ICatFactService>();
 var fileWriterService = host.Services.GetRequiredService<IFileWriterService>();
